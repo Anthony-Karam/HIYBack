@@ -3,7 +3,8 @@ const User = require("../models/user");
 
 class Controller {
   async getAll(req, res) {
-    const users = await User.find();
+    const users = await User.find({});
+    console.log(users);
     if (users.length == 0) {
       return res.status(404).json({
         success: false,
@@ -17,7 +18,7 @@ class Controller {
   }
 
   async getOneUser(req, res) {
-    const user = await User.findOne({ userName: req.body.userName });
+    const user = await User.findOne({ userName: req.params.userName });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -30,9 +31,9 @@ class Controller {
       });
   }
   async createUser(req, res) {
-    try {
-      console.log("1");
+    console.log("1");
 
+    try {
       await User.findOne(
         {
           $or: [
@@ -91,6 +92,36 @@ class Controller {
     } catch (err) {
       console.log(err);
     }
+  }
+  async updateUser(req, res) {
+    User.findOneAndUpdate(
+      { userName: req.params.userName },
+      { $set: req.body },
+      { new: true },
+      (err, user) => {
+        if (err)
+          return res.status(500).json({
+            success: false,
+            message: "Unvalid input",
+          });
+
+        return res.send(user);
+      }
+    );
+  }
+  async deleteUser(req, res) {
+    User.findOneAndDelete({ userName: req.params.userName }, (err, user) => {
+      if (err) return res.status(404).json({ success: false, message: err });
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "No user found" });
+      } else {
+        return res
+          .status(200)
+          .json({ success: false, message: "User deleted Successfully " });
+      }
+    });
   }
 }
 

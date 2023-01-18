@@ -18,7 +18,7 @@ mongoose
 //Routes
 const userRouter = require("./src/routes/user");
 
-app.use("/user", userRouter);
+app.use("/users", userRouter);
 
 app.listen(process.env.PORT, () => {
   console.log("Server running on http://localhost:3000");
