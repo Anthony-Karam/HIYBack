@@ -1,6 +1,9 @@
 const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
-
+const emailValidation = require("../utils/verificationCode");
+const jwt = require("jsonwebtoken");
+const Token = require("../models/token");
+const crypto = require("crypto");
 class Controller {
   async getAll(req, res) {
     const users = await User.find({});
@@ -58,15 +61,19 @@ class Controller {
               phoneNumber: req.body.phoneNumber,
               address: req.body.address,
             });
-
             await newUser.save();
-
+            let token = await new Token({
+              userId: newUser._id,
+              token: crypto.randomBytes(32).toString("hex"),
+            }).save();
+            const message = `http://localhost:3000/users/verify/${newUser.id}/${token.token}`;
+            emailValidation(newUser.emailAddress, "Verify Email", message);
+            res.send("An Email sent to your account please verify");
             return res.status(200).json({
               success: true,
               user: newUser,
             });
           }
-          console.log("3");
           if (user.userName === req.body.userName) {
             return res.status(400).json({
               success: false,
@@ -122,6 +129,25 @@ class Controller {
           .json({ success: false, message: "User deleted Successfully " });
       }
     });
+  }
+  async verifyUser(req, res) {
+    try {
+      const user = await User.findOne({ _id: req.params.id });
+      if (!user) return res.status(400).send("Invalid link");
+
+      const token = await Token.findOne({
+        userId: user._id,
+        token: req.params.token,
+      });
+      if (!token) return res.status(400).send("Invalid link");
+
+      await User.updateOne({ _id: user._id, verified: true });
+      await Token.findByIdAndRemove(token._id);
+
+      res.send("email verified sucessfully");
+    } catch (error) {
+      res.status(400).send("An error occured");
+    }
   }
 }
 

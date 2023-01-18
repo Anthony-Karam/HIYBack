@@ -33,8 +33,7 @@ const UserSchema = new Schema(
       maxLength: 34,
       required: true,
       unique: true,
-      match:
-        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+      match: /^\S+@\S+\.\S+$/,
     },
     phoneNumber: {
       type: String,
@@ -44,6 +43,7 @@ const UserSchema = new Schema(
       maxLength: 11,
       required: true,
       unique: true,
+      // match: /^\+961[0-9]{8}$/,
     },
     password: {
       type: String,
