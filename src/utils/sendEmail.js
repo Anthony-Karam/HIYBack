@@ -1,7 +1,7 @@
 // const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
-const emailValidation = async (email, subject, text) => {
+const sendEmail = async (email, token) => {
   // Create the transporter
   try {
     const transporter = nodemailer.createTransport({
@@ -11,18 +11,20 @@ const emailValidation = async (email, subject, text) => {
         pass: process.env.EMAIL_PASSWORD,
       },
     });
-
+    // construct the verification link
+    const link = `http://localhost:3000/users/verify/${token}`;
     // Define the email options
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: process.env.EMAIL_USERNAME,
       to: email,
-      subject: subject,
-      text: text,
+      subject: "Account Verification",
+      html: `<p>Please click on the following link to verify your account:</p>
+              <a href="${link}">${link}</a>`,
     });
-    console.log("email sent sucessfully");
+    console.log("Verification email sent: %s", info.messageId);
   } catch (error) {
     console.log("email not sent");
     console.log(error);
   }
 };
-module.exports = emailValidation;
+module.exports = sendEmail;

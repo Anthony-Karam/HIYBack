@@ -1,8 +1,8 @@
 const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
-const emailValidation = require("../utils/verificationCode");
 const jwt = require("jsonwebtoken");
-const Token = require("../models/token");
+const createVerificationToken = require("../utils/jwt");
+const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 class Controller {
   async getAll(req, res) {
@@ -33,11 +33,42 @@ class Controller {
         message: user,
       });
   }
+  async updateUser(req, res) {
+    User.findOneAndUpdate(
+      { userName: req.params.userName },
+      { $set: req.body },
+      { new: true },
+      (err, user) => {
+        if (err)
+          return res.status(500).json({
+            success: false,
+            message: "Unvalid input",
+          });
+
+        return res.send(user);
+      }
+    );
+  }
+  async deleteUser(req, res) {
+    console.log("delete");
+    User.findOneAndDelete({ userName: req.params.userName }, (err, user) => {
+      if (err) return res.status(404).json({ success: false, message: err });
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "No user Found " });
+      } else {
+        return res
+          .status(200)
+          .json({ success: true, message: "User deleted Successfully " });
+      }
+    });
+  }
   async createUser(req, res) {
     console.log("1");
 
     try {
-      await User.findOne(
+      User.findOne(
         {
           $or: [
             { userName: req.body.userName },
@@ -50,7 +81,6 @@ class Controller {
             console.log(err);
           }
           if (user == null) {
-            console.log("2");
             const newUser = new User({
               _id: mongoose.Types.ObjectId(),
               userName: req.body.userName,
@@ -62,13 +92,9 @@ class Controller {
               address: req.body.address,
             });
             await newUser.save();
-            let token = await new Token({
-              userId: newUser._id,
-              token: crypto.randomBytes(32).toString("hex"),
-            }).save();
-            const message = `http://localhost:3000/users/verify/${newUser.id}/${token.token}`;
-            emailValidation(newUser.emailAddress, "Verify Email", message);
-            res.send("An Email sent to your account please verify");
+            const token = createVerificationToken(newUser._id);
+            console.log(token);
+            sendEmail(newUser.emailAddress, token);
             return res.status(200).json({
               success: true,
               user: newUser,
@@ -100,11 +126,16 @@ class Controller {
       console.log(err);
     }
   }
-  async updateUser(req, res) {
-    User.findOneAndUpdate(
-      { userName: req.params.userName },
-      { $set: req.body },
-      { new: true },
+  async verifyUser(req, res) {
+    console.log("verify1");
+    try {
+      // const secretKey = crypto.randomBytes(64).toString("hex");
+      console.log("VERIFY Token params", req.params.token);
+      console.log("VERIFY SECRET", process.env.JWT_SECRET);
+      console.log(jwt.verify(req.params.token, process.env.JWT_SECRET), "id");
+      const { _id } = jwt.verify(req.params.token, process.env.JWT_SECRET);
+      console.log("verify0", { _id });
+
       (err, user) => {
         if (err)
           return res.status(500).json({
@@ -113,40 +144,24 @@ class Controller {
           });
 
         return res.send(user);
-      }
-    );
-  }
-  async deleteUser(req, res) {
-    User.findOneAndDelete({ userName: req.params.userName }, (err, user) => {
-      if (err) return res.status(404).json({ success: false, message: err });
-      if (!user) {
-        return res
-          .status(404)
-          .json({ success: false, message: "No user found" });
-      } else {
-        return res
-          .status(200)
-          .json({ success: false, message: "User deleted Successfully " });
-      }
-    });
-  }
-  async verifyUser(req, res) {
-    try {
-      const user = await User.findOne({ _id: req.params.id });
-      if (!user) return res.status(400).send("Invalid link");
+      };
 
-      const token = await Token.findOne({
-        userId: user._id,
-        token: req.params.token,
-      });
-      if (!token) return res.status(400).send("Invalid link");
-
-      await User.updateOne({ _id: user._id, verified: true });
-      await Token.findByIdAndRemove(token._id);
-
-      res.send("email verified sucessfully");
-    } catch (error) {
-      res.status(400).send("An error occured");
+      User.findByIdAndUpdate(
+        { _id },
+        { verified: true },
+        { new: true },
+        async (err, user) => {
+          if (err) {
+            return res
+              .status(404)
+              .json({ success: false, message: "No user found" });
+          }
+          console.log(user.verified);
+          res.json({ success: true, message: "Verification successful" });
+        }
+      );
+    } catch (err) {
+      return res.status(401).json({ success: false, message: "Invalid token" });
     }
   }
 }
