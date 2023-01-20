@@ -94,7 +94,7 @@ class Controller {
             await newUser.save();
             const token = createVerificationToken(newUser._id);
             console.log(token);
-            sendEmail(newUser.emailAddress, token);
+            sendEmail(newUser.emailAddress, token, newUser.userName);
             return res.status(200).json({
               success: true,
               user: newUser,

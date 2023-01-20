@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": " nodemon server.js",
+    "start": " nodemon babel-node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,5 +27,6 @@
     "mongoose": "^6.8.3",
     "nodemailer": "^6.9.0",
     "nodemon": "^2.0.20"
-  }
+  },
+  "devDependencies": {}
 }

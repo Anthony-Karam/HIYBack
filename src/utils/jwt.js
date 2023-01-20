@@ -5,7 +5,7 @@ const createVerificationToken = (_id) => {
   console.log("VERIFY SECRET jwt.js", process.env.JWT_SECRET);
   console.log(_id, "id");
   const token = jwt.sign({ _id }, process.env.JWT_SECRET, {
-    expiresIn: "10h",
+    expiresIn: "5h",
   });
   console.log("token jwt.js", token);
   return token;

@@ -83,7 +83,7 @@ UserSchema.pre("save", async function (next) {
   try {
     const SALT_ROUNDS = 10 || process.env.SALT_ROUNDS;
     const salt = await bcrypt.genSalt(SALT_ROUNDS);
-    console.log(salt);
+
     const hashedPassword = await bcrypt.hash(this.password, salt);
     this.password = hashedPassword;
     next();
