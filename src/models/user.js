@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 const bcrypt = require("bcrypt");
-const SALT_ROUNDS = process.env.SALT_ROUNDS || 10;
+
 // console.log(wt);
 const UserSchema = new Schema(
   {
@@ -42,7 +42,6 @@ const UserSchema = new Schema(
       minLength: 10,
       maxLength: 11,
       required: true,
-      unique: true,
       // match: /^\+961[0-9]{8}$/,
     },
     password: {
@@ -50,7 +49,7 @@ const UserSchema = new Schema(
       required: true,
       minLength: 8,
       maxLength: 16,
-      select: false,
+      // select: false,
     },
     address: {
       type: String,
@@ -83,7 +82,7 @@ UserSchema.pre("save", async function (next) {
   try {
     const SALT_ROUNDS = 10 || process.env.SALT_ROUNDS;
     const salt = await bcrypt.genSalt(SALT_ROUNDS);
-
+    console.log("pass", this.password);
     const hashedPassword = await bcrypt.hash(this.password, salt);
     this.password = hashedPassword;
     next();
@@ -92,12 +91,5 @@ UserSchema.pre("save", async function (next) {
   }
 });
 
-UserSchema.methods.isValidPassword = async function (password) {
-  try {
-    return await bcrypt.compare(password, this.password);
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 const User = model("User", UserSchema);
 module.exports = User;

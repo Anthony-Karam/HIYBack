@@ -3,7 +3,7 @@ const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const createVerificationToken = require("../utils/jwt");
 const sendEmail = require("../utils/sendEmail");
-const crypto = require("crypto");
+// const crypto = require("crypto");
 class Controller {
   async getAll(req, res) {
     const users = await User.find({});
@@ -92,7 +92,7 @@ class Controller {
               address: req.body.address,
             });
             await newUser.save();
-            const token = createVerificationToken(newUser._id);
+            const token = createVerificationToken(newUser._id, "24h");
             console.log(token);
             sendEmail(newUser.emailAddress, token, newUser.userName);
             return res.status(200).json({

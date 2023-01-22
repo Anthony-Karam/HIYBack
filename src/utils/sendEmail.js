@@ -1,5 +1,6 @@
 // const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+
 const sendEmail = async (email, token, userName) => {
   // Create the transporter
   try {
@@ -26,7 +27,7 @@ const sendEmail = async (email, token, userName) => {
       <h4>We're happy you signed up for Ring.<br>
       To start exploring Hope In Youth's courses,<br>
       please confirm your email address</h4>
-      <button onclick=${link}>Verify Now </button><br>
+      <a href=${link}>Verify Now </a><br>
       <h4>Welcome to Hope In Youth!</h4>
       <h5>HIY Team.</h5>`,
     });
