@@ -92,7 +92,8 @@ class Controller {
               address: req.body.address,
             });
             await newUser.save();
-            const token = createVerificationToken(newUser._id, "24h");
+            const t = "24h";
+            const token = createVerificationToken(newUser._id, t);
             console.log(token);
             sendEmail(newUser.emailAddress, token, newUser.userName);
             return res.status(200).json({

@@ -1,10 +1,10 @@
 var express = require("express");
 var router = express.Router();
 const UserController = require("../controllers/user");
-
+const AuthController = require("../controllers/authenticate");
 router.post("/register", UserController.createUser);
 router.get("/:userName", UserController.getOneUser);
-router.get("/", UserController.getAll);
+router.get("/", AuthController.authenticateToken, UserController.getAll);
 router.get("/verify/:token", UserController.verifyUser);
 
 router.put("/:userName", UserController.updateUser);

@@ -49,7 +49,8 @@ class Controller {
           });
         } else {
           console.log("5");
-          const token = createVerificationToken(user._id, "5h");
+          const t = "5h";
+          const token = createVerificationToken(user._id, t);
           return res.json({
             accesstoken: token,
             success: true,
