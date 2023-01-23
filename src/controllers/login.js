@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const createVerificationToken = require("../utils/jwt");
+const { createTokenAndRefreshToken } = require("../utils/jwt");
 
 class Controller {
   async login(req, res) {
@@ -12,8 +12,6 @@ class Controller {
       let emailAddress = req.body.emailAddress;
       let loginPassword = req.body.password;
       if ((!emailAddress || !userNameField) && !loginPassword) {
-        console.log("1");
-
         return res.json({
           success: false,
           message: "Please enter your User Name/Email address or password ",
@@ -26,14 +24,12 @@ class Controller {
         ],
       });
       if (!user) {
-        console.log("2");
         return res.json({
           success: false,
           message: "PLease enter a valid User name or Email address",
         });
       }
       if (user) {
-        console.log("3");
         let match = await bcrypt.compare(req.body.password, user.password);
         if (!match) {
           return res.json({
@@ -42,19 +38,17 @@ class Controller {
           });
         }
         if (match && user.verified != true) {
-          console.log("4");
           return res.json({
             success: false,
             message: "Please verify your Email address",
           });
         } else {
-          console.log("5");
-          const t = "5h";
-          const token = createVerificationToken(user._id, t);
+          let accessRefreshtoken = await createTokenAndRefreshToken(user._id);
+          console.log(accessRefreshtoken);
           return res.json({
-            accesstoken: token,
             success: true,
-            message: "logged in",
+            message: "Please verify your Email address",
+            token: accessRefreshtoken,
           });
         }
       }

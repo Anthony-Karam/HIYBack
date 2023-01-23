@@ -5,6 +5,7 @@ const AuthController = require("../controllers/authenticate");
 router.post("/register", UserController.createUser);
 router.get("/:userName", UserController.getOneUser);
 router.get("/", AuthController.authenticateToken, UserController.getAll);
+router.post("/refresh-token", AuthController.authemticateRefreshToken);
 router.get("/verify/:token", UserController.verifyUser);
 
 router.put("/:userName", UserController.updateUser);
