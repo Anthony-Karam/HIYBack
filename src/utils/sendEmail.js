@@ -17,19 +17,22 @@ const sendEmail = async (email, token, userName) => {
     // construct the verification link
     const link = `${process.env.URL}/users/verify/${token}`;
     // Define the email options
+
     const info = await transporter.sendMail({
       from: "info@hopeinyouth.com",
       to: email,
       subject: "Account Verification",
       html: `<h1>Hope In YOUth</h1>
-      <h2>Hi ${userName},</h2>
-      
-      <h4>We're happy you signed up for Ring.<br>
-      To start exploring Hope In Youth's courses,<br>
-      please confirm your email address</h4>
-      <a href=${link}>Verify Now </a><br>
-      <h4>Welcome to Hope In Youth!</h4>
-      <h5>HIY Team.</h5>`,
+    <h2>Hi ${userName},</h2>
+    
+    <h4>We're happy you signed up for Ring.<br>
+    To start exploring Hope In Youth's courses,<br>
+    please confirm your email address</h4>
+    <a href=${link}>Verify Now </a><br>
+    <h2>Please note that this link is available for 24h</h2>
+  
+    <h4>Welcome to Hope In Youth!</h4>
+    <h5>HIY Team.</h5>`,
     });
     console.log("Verification email sent: %s", info.messageId);
   } catch (error) {

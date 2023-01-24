@@ -1,7 +1,9 @@
 const jwt = require("jsonwebtoken");
 const Token = require("../models/tokenSchema");
 const User = require("../models/user");
+const { createVerificationToken } = require("../utils/jwt");
 class Controller {
+  //Verifies the accessToken
   async authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
@@ -22,34 +24,38 @@ class Controller {
       next();
     });
   }
-
-  async authemticateRefreshToken(req, res) {
+  //Verifies refreshToken and generates a new accessToken
+  async authenticateRefreshToken(req, res) {
     try {
+      const currentTime = Date.now() / 1000;
       const authHeader = req.headers["authorization"];
       if (!authHeader) {
         return res.status(401).json({ message: "Invalid token" });
       }
       const [, refreshToken] = authHeader.split(" ");
-
       // verify the token's signature and check the expiration time
       const decoded = jwt.verify(
         refreshToken,
         process.env.JWT_REFRESHTOKE_SECRET
       );
-      if (!decoded) {
+
+      if (!decoded || !decoded.userId) {
         // if the token is invalid, return an error
         return res.status(401).json({ message: "Invalid token" });
       }
+      //check if refreshToken exists in the db
+      const token = await Token.findOne({
+        "refreshToken.refreshTokenType": refreshToken,
+        // "refreshToken.refreshTokenType": "refreshToken",
+      });
+      console.log(token);
 
-      // check if the userId exists in the token payload
-      if (!decoded.userId) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
-      const token = await Token.findOne({ refreshToken });
       if (!token) {
         return res.status(404).json({ message: "Invalid refresh token" });
       }
+
       const { _userId } = token;
+      //check if the userId of the token is the same as the userId in users
       const user = await User.findById(_userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -58,16 +64,18 @@ class Controller {
       if (_userId.toString() !== decoded.userId) {
         return res.status(401).json({ message: "Invalid token" });
       }
-      const accessToken = jwt.sign(
-        { userId: user._id },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "1h",
-        }
+      //generates a new accessToken
+      const accessToken = createVerificationToken(
+        _userId,
+        process.env.JWT_TIME_ACCESS
       );
+      //Updates the old access token in tokens
+
       const updatedToken = await Token.findByIdAndUpdate(
         token._id,
-        { accessToken },
+        {
+          "accessToken.accessTokenType": accessToken,
+        },
         { new: true }
       );
       if (!updatedToken) {

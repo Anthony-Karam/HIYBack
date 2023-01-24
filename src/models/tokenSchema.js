@@ -7,17 +7,25 @@ const tokenSchema = new Schema({
     ref: "User",
   },
   accessToken: {
-    type: String,
-    required: true,
+    accessTokenType: {
+      type: String,
+      required: true,
+    },
+    expiresIn: {
+      type: String,
+      required: true,
+    },
   },
   refreshToken: {
-    type: String,
-    required: true,
+    refreshTokenType: {
+      type: String,
+      required: true,
+    },
+    expiresIn: {
+      type: String,
+      required: true,
+    },
   },
-  // expiresIn: {
-  //   type: String,
-  //   required: true,
-  // },
 });
 
 const Token = model("Token", tokenSchema);

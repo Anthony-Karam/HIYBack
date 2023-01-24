@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
-const createVerificationToken = require("../utils/jwt");
+const { createVerificationToken } = require("../utils/jwt");
 const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 class Controller {
@@ -65,8 +65,6 @@ class Controller {
     });
   }
   async createUser(req, res) {
-    console.log("1");
-
     try {
       User.findOne(
         {
@@ -92,9 +90,8 @@ class Controller {
               address: req.body.address,
             });
             await newUser.save();
-            const t = "24h";
+            const t = "48h";
             const token = createVerificationToken(newUser._id, t);
-            console.log(token);
             sendEmail(newUser.emailAddress, token, newUser.userName);
             return res.status(200).json({
               success: true,
@@ -128,15 +125,8 @@ class Controller {
     }
   }
   async verifyUser(req, res) {
-    console.log("verify1");
     try {
-      // const secretKey = crypto.randomBytes(64).toString("hex");
-      console.log("VERIFY Token params", req.params.token);
-      console.log("VERIFY SECRET", process.env.JWT_SECRET);
-      console.log(jwt.verify(req.params.token, process.env.JWT_SECRET), "id");
       const { _id } = jwt.verify(req.params.token, process.env.JWT_SECRET);
-      console.log("verify0", { _id });
-
       (err, user) => {
         if (err)
           return res.status(500).json({
@@ -157,7 +147,6 @@ class Controller {
               .status(404)
               .json({ success: false, message: "No user found" });
           }
-          console.log(user.verified);
           res.json({ success: true, message: "Verification successful" });
         }
       );

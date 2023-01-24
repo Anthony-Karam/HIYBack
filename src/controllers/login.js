@@ -47,7 +47,7 @@ class Controller {
           console.log(accessRefreshtoken);
           return res.json({
             success: true,
-            message: "Please verify your Email address",
+            message: "Logged in ",
             token: accessRefreshtoken,
           });
         }
