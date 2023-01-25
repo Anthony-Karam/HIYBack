@@ -16,11 +16,17 @@ mongoose
   });
 
 //Routes
+
 const userRouter = require("./src/routes/user");
+//Create,update,delete,get
 app.use("/users", userRouter);
 
+//login/
 const loginRouter = require("./src/routes/login");
 app.use("/users", loginRouter);
+
+const logOutRouter = require("./src/routes/logOut");
+app.use("/users", logOutRouter);
 
 app.listen(process.env.PORT, () => {
   console.log("Server running on http://localhost:3000");

@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const { createTokenAndRefreshToken } = require("../utils/jwt");
 
 class Controller {
-  async login(req, res) {
+  async logIn(req, res) {
     try {
       let userNameField = req.body.userName;
 
