@@ -28,6 +28,10 @@ app.use("/users", loginRouter);
 const logOutRouter = require("./src/routes/logOut");
 app.use("/users", logOutRouter);
 
+///Admin routes
+const categoryRouter = require("./src/routes/category");
+app.use("/admin", categoryRouter);
+
 app.listen(process.env.PORT, () => {
   console.log("Server running on http://localhost:3000");
 });
