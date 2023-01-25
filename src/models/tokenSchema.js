@@ -7,24 +7,12 @@ const tokenSchema = new Schema({
     ref: "User",
   },
   accessToken: {
-    accessTokenType: {
-      type: String,
-      required: true,
-    },
-    expiresIn: {
-      type: String,
-      required: true,
-    },
+    type: String,
+    required: true,
   },
   refreshToken: {
-    refreshTokenType: {
-      type: String,
-      required: true,
-    },
-    expiresIn: {
-      type: String,
-      required: true,
-    },
+    type: String,
+    required: true,
   },
 });
 

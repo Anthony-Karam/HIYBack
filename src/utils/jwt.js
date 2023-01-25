@@ -9,26 +9,19 @@ const createVerificationToken = (_id, exp) => {
 };
 
 const createTokenAndRefreshToken = async (user_id) => {
+  console.log(process.env.JWT_TIME_ACCESS, process.env.JWT_TIME_REFRESH);
   const accessToken = jwt.sign({ userId: user_id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_TIME_ACCESS,
   });
   const refreshToken = jwt.sign(
     { userId: user_id },
-    process.env.JWT_REFRESHTOKE_SECRET,
-    {
-      expiresIn: process.env.JWT_TIME_REFRESh,
-    }
+    process.env.JWT_REFRESHTOKEN_SECRET,
+    { expiresIn: process.env.JWT_TIME_REFRESH }
   );
   const token = await Token.create({
     _userId: user_id,
-    accessToken: {
-      accessTokenType: accessToken,
-      expiresIn: process.env.JWT_TIME_ACCESS,
-    },
-    refreshToken: {
-      refreshTokenType: refreshToken,
-      expiresIn: process.env.JWT_TIME_REFRESh,
-    },
+    accessToken,
+    refreshToken,
   });
   if (!token) return "token not valid ";
 

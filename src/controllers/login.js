@@ -44,7 +44,7 @@ class Controller {
           });
         } else {
           let accessRefreshtoken = await createTokenAndRefreshToken(user._id);
-          console.log(accessRefreshtoken);
+          console.log("login", accessRefreshtoken);
           return res.json({
             success: true,
             message: "Logged in ",
