@@ -81,20 +81,32 @@ class Controller {
   }
   async updateCourse(req, res) {
     try {
-      const updtCourse = await Course.findByIdAndUpdate(
-        { _id: req.params.id },
-        { $set: req.body },
-        { new: true }
-      );
-      if (!updtCourse) {
-        return res.status(500).json({
-          success: false,
-          message: "Unvalid input",
+      //find the course
+      const course = await Course.findById(req.params.id);
+      if (!course)
+        return res.status(200).json({
+          success: true,
+          message: "No course found with this id ",
         });
+      //find the category and remove the course from the coursList
+      await Category.findByIdAndUpdate(course.category, {
+        $pull: { coursesList: course._id },
+      });
+      course.category = req.body.category;
+      console.log(course.category);
+      const categoryCheck = await Category.findByIdAndUpdate(course.category, {
+        $push: { coursesList: course._id },
+      });
+      if (!categoryCheck) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Category not available" });
       }
-      return res.status(200).json(updtCourse);
+
+      await course.save();
+      res.status(200).json({ message: "Course updated successfully" });
     } catch (err) {
-      return res.status(401).json({ message: err.message });
+      res.status(500).json({ message: err.message });
     }
   }
   async deleteCourse(req, res) {
