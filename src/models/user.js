@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
 
 // console.log(wt);
@@ -68,9 +68,11 @@ const UserSchema = new Schema(
     },
     enrolled: [
       {
-        courseName: String,
-        courseId: String,
-        default: 0,
+        course: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Course",
+          // required: true,
+        },
       },
     ],
   },

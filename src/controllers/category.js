@@ -1,4 +1,5 @@
 const Category = require("../models/categorySchema");
+const Course = require("../models/courseSchema");
 
 class Controller {
   async createCat(req, res) {
@@ -42,13 +43,14 @@ class Controller {
     } catch (err) {
       res.json({
         sucess: false,
-        message: err,
+        message: err.message,
       });
     }
   }
   async getOneCat(req, res) {
     try {
-      const category = await Category.findOne({ name: req.body.name });
+      const category = await Category.findOne({ _id: req.params.id });
+      // .populate("coursesList")
       if (!category) {
         return res.status(200).json({
           sucess: false,
@@ -62,7 +64,7 @@ class Controller {
     } catch (err) {
       res.json({
         sucess: false,
-        message: err,
+        message: err.message,
       });
     }
   }
@@ -86,9 +88,10 @@ class Controller {
   }
   async deleteCat(req, res) {
     try {
-      await Category.findOneAndDelete({ name: req.body.name });
+      const category = await Category.findByIdAndDelete(req.params.id);
+      await Course.deleteMany({ category: category._id });
       return res.status(200).json({
-        sucess: true,
+        success: true,
         message: "Successfully deleted",
       });
     } catch (err) {

@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, default: mongoose } = require("mongoose");
 
 const courseSchema = new Schema({
   name: {
@@ -27,15 +27,20 @@ const courseSchema = new Schema({
         type: String,
         required: true,
       },
-      image: {
-        type: Buffer,
-        required: true,
-      },
+      // image: {
+      //   type: Buffer,
+      //   required: true,
+      // },
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+  },
+  category: {
+    type: Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
