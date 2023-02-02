@@ -35,6 +35,9 @@ app.use("/admin", categoryRouter);
 const courseRouter = require("./src/routes/course");
 app.use("/admin", courseRouter);
 
+const aboutRouter = require("./src/routes/about");
+app.use("/admin", aboutRouter);
+
 app.listen(process.env.PORT, () => {
   console.log("Server running on http://localhost:3000");
 });

@@ -1,4 +1,4 @@
-const { Schema, model, default: mongoose } = require("mongoose");
+const { Schema, model } = require("mongoose");
 const Course = require("./courseSchema");
 const categorySchema = new Schema({
   name: {
