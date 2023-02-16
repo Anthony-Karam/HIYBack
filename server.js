@@ -6,6 +6,8 @@ const bp = require("body-parser");
 const path = require("path");
 const fs = require("fs");
 var cors = require("cors");
+const S3Controller = require("./src/controllers/s3");
+
 app.use(
   cors({
     // origin: "http://localhost:3000",
@@ -27,6 +29,8 @@ mongoose
     console.log(err);
   });
 
+// app.post("/upload", S3Controller.multerS3UploadVideos(), S3Controller.s3Upload);
+app.get("/download/:filename", S3Controller.s3Read);
 // app.use(express.static("public/images"));
 //Routes
 
@@ -49,11 +53,17 @@ const courseRouter = require("./src/routes/course");
 app.use("/admin", courseRouter);
 
 const aboutRouter = require("./src/routes/about");
+
 app.use("/admin/about", aboutRouter);
 
 app.get("/aboutImages/:imageName", (req, res) => {
   res.sendFile(
     path.join(__dirname, `src/public/aboutImages/${req.params.imageName}`)
+  );
+});
+app.get("/courseImages/:imageName", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, `src/public/courseImages/${req.params.imageName}`)
   );
 });
 

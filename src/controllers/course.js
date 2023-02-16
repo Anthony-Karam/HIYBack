@@ -1,6 +1,10 @@
 const Category = require("../models/categorySchema");
 const Course = require("../models/courseSchema");
+// const path = require("path");
 
+// const multer = require("multer");
+// const multerS3 = require("multer-s3");
+// require("dotenv").config();
 class Controller {
   async createCourse(req, res) {
     try {
@@ -11,24 +15,35 @@ class Controller {
           message: "Select another name",
         });
       }
-      const categoryId = await Category.findOne({ _id: req.body.category });
+      const categoryId = await Category.findById(req.body.category);
       if (!categoryId) {
         return res.status(404).json({
           success: false,
           message: "Category not available",
         });
       }
+      // let image = "";
+      // let instructorImage = "";
+      // if (req.files && req.files.length > 0) {
+      //   image = req.files[0].filename;
+      //   instructorImage = req.files[1].filename;
+      // }
+      const image = req.files.image[0].location;
+      const instructorImage = req.files.instructorImage[0].location;
+      const video = req.files.video[0].location;
       const courseCreated = await Course.create({
         name: req.body.name,
+        image,
+        instructorImage,
         description: {
           skills: req.body.description.skills,
           about: req.body.description.about,
           whatToLearn: req.body.description.whatToLearn,
-          instructor: {
-            name: req.body.description.instructor.name,
-            details: req.body.description.instructor.details,
-          },
+          instructorName: req.body.description.instructorName,
+          instructorDetails: req.body.description.instructorDetails,
         },
+
+        video,
         category: req.body.category,
       });
       await courseCreated.save();
@@ -123,5 +138,4 @@ class Controller {
   }
 }
 
-const CourseController = new Controller();
-module.exports = CourseController;
+module.exports = { CourseController: new Controller() };
