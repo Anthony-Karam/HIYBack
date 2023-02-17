@@ -3,6 +3,8 @@ const { GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
+const { createReadStream } = require("fs");
+const { Readable } = require("stream");
 require("dotenv").config();
 
 class Controller {
@@ -44,8 +46,16 @@ class Controller {
     });
 
     try {
-      const url = await getSignedUrl(this.s3, command, { expiresIn: 3600 });
-      res.redirect(url);
+      const response = await this.s3.send(command);
+      // const videoStream = createReadStream(response.Body._readableState.buffer);
+
+      // videoStream.push(response.Body);
+      // videoStream.push(null);
+      res.set({
+        "Content-Type": "video/mp4",
+        "Content-Length": response.ContentLength,
+      });
+      response.Body.pipe(res);
     } catch (err) {
       console.log(err);
       return res.status(400).send("Error retrieving file from S3.");

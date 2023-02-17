@@ -30,7 +30,7 @@ mongoose
   });
 
 // app.post("/upload", S3Controller.multerS3UploadVideos(), S3Controller.s3Upload);
-app.get("/download/:filename", S3Controller.s3Read);
+app.get("/videos/:filename", S3Controller.s3Read);
 // app.use(express.static("public/images"));
 //Routes
 
