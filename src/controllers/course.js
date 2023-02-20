@@ -1,10 +1,6 @@
 const Category = require("../models/categorySchema");
 const Course = require("../models/courseSchema");
-// const path = require("path");
-
-// const multer = require("multer");
-// const multerS3 = require("multer-s3");
-// require("dotenv").config();
+const path = require("path");
 class Controller {
   async createCourse(req, res) {
     try {
@@ -22,15 +18,10 @@ class Controller {
           message: "Category not available",
         });
       }
-      // let image = "";
-      // let instructorImage = "";
-      // if (req.files && req.files.length > 0) {
-      //   image = req.files[0].filename;
-      //   instructorImage = req.files[1].filename;
-      // }
-      const image = req.files.image[0].location;
-      const instructorImage = req.files.instructorImage[0].location;
-      const video = req.files.video[0].location;
+
+      const image = req.files.image[0].key.split("/").pop();
+      const instructorImage = req.files.instructorImage[0].key.split("/").pop();
+      const video = req.files.video.map((file) => file.key.split("/").pop());
       const courseCreated = await Course.create({
         name: req.body.name,
         image,

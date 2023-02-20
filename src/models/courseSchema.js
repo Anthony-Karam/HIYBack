@@ -41,10 +41,12 @@ const courseSchema = new Schema({
       },
     ],
   },
-  video: {
-    type: String,
-    // required: true,
-  },
+  video: [
+    {
+      type: String,
+      // required: true,
+    },
+  ],
 
   category: {
     type: Schema.Types.ObjectId,

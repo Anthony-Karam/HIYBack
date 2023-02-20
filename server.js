@@ -29,8 +29,11 @@ mongoose
     console.log(err);
   });
 
-// app.post("/upload", S3Controller.multerS3UploadVideos(), S3Controller.s3Upload);
+app.post("/upload", S3Controller.multerS3UploadVideos(), S3Controller.s3Upload);
 app.get("/videos/:filename", S3Controller.s3Read);
+app.get("/images/:filename", S3Controller.getImageS3);
+app.get("/videosList", S3Controller.listingVideo);
+
 // app.use(express.static("public/images"));
 //Routes
 

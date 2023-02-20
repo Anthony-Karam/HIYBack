@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, default: mongoose } = require("mongoose");
 const Course = require("./courseSchema");
 const categorySchema = new Schema({
   name: {
@@ -8,7 +8,7 @@ const categorySchema = new Schema({
   },
   coursesList: [
     {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
     },
   ],
@@ -19,18 +19,18 @@ const categorySchema = new Schema({
   },
 });
 
-categorySchema.pre("findOne", function () {
-  this.populate({
-    path: "coursesList",
-    select: "name",
-  });
-});
-categorySchema.pre("find", function () {
-  this.populate({
-    path: "coursesList",
-    select: "name",
-  });
-});
+// categorySchema.pre("findOne", function () {
+//   this.populate({
+//     path: "coursesList",
+//     select: "name",
+//   });
+// });
+// categorySchema.pre("find", function () {
+//   this.populate({
+//     path: "coursesList",
+//     select: "name",
+//   });
+// });
 // categorySchema.pre("findOneAndDelete", async function (next) {
 //   const categoryId = this._id;
 //   console.log(categoryId);

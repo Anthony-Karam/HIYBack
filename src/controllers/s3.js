@@ -1,10 +1,7 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, ListObjectsCommand } = require("@aws-sdk/client-s3");
 const { GetObjectCommand } = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
-const { createReadStream } = require("fs");
-const { Readable } = require("stream");
 require("dotenv").config();
 
 class Controller {
@@ -16,8 +13,11 @@ class Controller {
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       },
     });
+
     this.BUCKET = process.env.AWS_BUCKET || "hiy-videos";
     this.s3Read = this.s3Read.bind(this);
+    this.getImageS3 = this.getImageS3.bind(this);
+    this.listingVideo = this.listingVideo.bind(this);
   }
 
   multerS3UploadVideos() {
@@ -33,24 +33,42 @@ class Controller {
     });
     return upload.single("video");
   }
+
   async s3Upload(req, res) {
     if (req.file.location) {
       res.send("Successfully uploaded " + req.file.location + " location!");
     } else return res.send("not successfully uploaded");
   }
 
+  async getImageS3(req, res) {
+    const getObjectParams = new GetObjectCommand({
+      Bucket: this.BUCKET,
+      Key: `images/${req.params.filename}`,
+    });
+    try {
+      const response = await this.s3.send(getObjectParams);
+      res.set({
+        "Content-Type": "image/png",
+        "Content-Length": response.ContentLength,
+      });
+      response.Body.pipe(res);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).send("Error retrieving file from S3.");
+    }
+  }
   async s3Read(req, res) {
+    const fileName = req.params.filename;
+    const folderName = "videos";
+    const key = `${folderName}/${fileName}`;
+    console.log(key);
     const command = new GetObjectCommand({
       Bucket: this.BUCKET,
-      Key: req.params.filename,
+      Key: key,
     });
 
     try {
       const response = await this.s3.send(command);
-      // const videoStream = createReadStream(response.Body._readableState.buffer);
-
-      // videoStream.push(response.Body);
-      // videoStream.push(null);
       res.set({
         "Content-Type": "video/mp4",
         "Content-Length": response.ContentLength,
@@ -59,6 +77,22 @@ class Controller {
     } catch (err) {
       console.log(err);
       return res.status(400).send("Error retrieving file from S3.");
+    }
+  }
+
+  async listingVideo(req, res) {
+    const params = {
+      Bucket: this.BUCKET,
+    };
+
+    const command = new ListObjectsCommand(params);
+    try {
+      const data = await this.s3.send(command);
+      const videoList = data.Contents.filter((obj) => obj.Key.endsWith(".mp4"));
+      res.json(videoList);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Error retrieving videos from S3" });
     }
   }
 }

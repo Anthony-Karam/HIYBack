@@ -29,7 +29,7 @@ class Controller {
   }
   async getAllCat(req, res) {
     try {
-      const getall = await Category.find({});
+      const getall = await Category.find().populate("coursesList");
       if (getall.length == 0) {
         return res.status(200).json({
           sucess: false,

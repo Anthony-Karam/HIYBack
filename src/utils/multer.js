@@ -32,7 +32,7 @@ const uploadFiles = () => {
   return upload.fields([
     { name: "image", maxCount: 1 },
     { name: "instructorImage", maxCount: 1 },
-    { name: "video", maxCount: 1 },
+    { name: "video", maxCount: 20 },
   ]);
 };
 
