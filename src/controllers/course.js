@@ -22,6 +22,7 @@ class Controller {
       const image = req.files.image[0].key.split("/").pop();
       const instructorImage = req.files.instructorImage[0].key.split("/").pop();
       const video = req.files.video.map((file) => file.key.split("/").pop());
+      console.log(video);
       const courseCreated = await Course.create({
         name: req.body.name,
         image,

@@ -6,7 +6,6 @@ const bp = require("body-parser");
 const path = require("path");
 const fs = require("fs");
 var cors = require("cors");
-const S3Controller = require("./src/controllers/s3");
 
 app.use(
   cors({
@@ -29,16 +28,15 @@ mongoose
     console.log(err);
   });
 
-app.post("/upload", S3Controller.multerS3UploadVideos(), S3Controller.s3Upload);
-app.get("/videos/:filename", S3Controller.s3Read);
-app.get("/images/:filename", S3Controller.getImageS3);
-app.get("/videosList", S3Controller.listingVideo);
-
 // app.use(express.static("public/images"));
 //Routes
 
-const userRouter = require("./src/routes/user");
+//s3Routes
+const s3Router = require("./src/routes/s3");
+app.use("/users", s3Router);
+
 //Create,update,delete,get
+const userRouter = require("./src/routes/user");
 app.use("/users", userRouter);
 
 //login/
@@ -56,17 +54,10 @@ const courseRouter = require("./src/routes/course");
 app.use("/admin", courseRouter);
 
 const aboutRouter = require("./src/routes/about");
-
 app.use("/admin/about", aboutRouter);
-
 app.get("/aboutImages/:imageName", (req, res) => {
   res.sendFile(
     path.join(__dirname, `src/public/aboutImages/${req.params.imageName}`)
-  );
-});
-app.get("/courseImages/:imageName", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, `src/public/courseImages/${req.params.imageName}`)
   );
 });
 

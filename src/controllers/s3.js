@@ -81,14 +81,28 @@ class Controller {
   }
 
   async listingVideo(req, res) {
+    const courses = req.params.courses;
+    console.log("courses:", courses);
     const params = {
       Bucket: this.BUCKET,
+      // Prefix: "videos/",
     };
 
     const command = new ListObjectsCommand(params);
     try {
       const data = await this.s3.send(command);
-      const videoList = data.Contents.filter((obj) => obj.Key.endsWith(".mp4"));
+      const videoList = data.Contents.filter((obj) => {
+        const videoName = obj.Key.split("/").pop();
+        console.log("videoName:", videoName);
+        // let vid = courses.includes(
+        //   videoName.slice(0, videoName.lastIndexOf("."))
+        // );
+        // console.log("Viiiiiiiid:", vid);
+        return (
+          obj.Key.endsWith(".mp4") &&
+          courses.includes(videoName.slice(0, videoName.lastIndexOf(".")))
+        );
+      });
       res.json(videoList);
     } catch (err) {
       console.error(err);
