@@ -39,8 +39,8 @@ const UserSchema = new Schema(
       type: String,
       unique: true,
       required: true,
-      minLength: 10,
-      maxLength: 11,
+      minLength: 11,
+      maxLength: 12,
       required: true,
       // match: /^\+961[0-9]{8}$/,
     },
@@ -57,6 +57,18 @@ const UserSchema = new Schema(
       maxLength: 10,
       required: true,
     },
+    enrolled: [
+      {
+        courseName: {
+          type: String,
+          default: "Not Enrolled",
+        },
+        courseProgress: {
+          type: String,
+          default: 0,
+        },
+      },
+    ],
     verified: {
       type: Boolean,
       default: false,
@@ -66,15 +78,6 @@ const UserSchema = new Schema(
       type: Date,
       default: Date.now,
     },
-    enrolled: [
-      {
-        course: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Course",
-          // required: true,
-        },
-      },
-    ],
   },
   {
     collection: "users",

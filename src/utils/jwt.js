@@ -18,13 +18,10 @@ const createTokenAndRefreshToken = async (user_id) => {
     process.env.JWT_REFRESHTOKEN_SECRET,
     { expiresIn: process.env.JWT_TIME_REFRESH }
   );
-  const token = await Token.create({
+  return await Token.create({
     _userId: user_id,
     accessToken,
     refreshToken,
   });
-  if (!token) return "token not valid ";
-
-  return token;
 };
 module.exports = { createVerificationToken, createTokenAndRefreshToken };

@@ -3,28 +3,26 @@ const Token = require("../models/tokenSchema");
 const User = require("../models/user");
 const { createVerificationToken } = require("../utils/jwt");
 class Controller {
-  //Verifies the accessToken
+  //Verifies the accessT
   async authenticateToken(req, res, next) {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    if (!token) {
-      return res
-        .status("401")
-        .json({ success: "false", message: "No token sent" });
-    }
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.status(403).json({
-          success: "false",
-          message: "No access",
-        });
+    try {
+      const authHeader = await req.headers["authorization"];
+      const accessT = authHeader.split(" ")[1].replace(/"/g, "");
+      if (!accessT) {
+        return res.status(401).json({ message: "Unauthorized access" });
       }
-      req.user = user;
-      console.log("user", user);
+
+      const decoded = jwt.verify(accessT, process.env.JWT_SECRET);
+      req.user = decoded.user;
+      if (!decoded) {
+        return res.status(401).json({ message: "Please log in to continue " });
+      }
       next();
-    });
+    } catch (err) {
+      return res.status(403).json({ message: err });
+    }
   }
-  //Verifies refreshToken and generates a new accessToken
+  //Verifies refreshToken and generates a new accessT
   async authenticateRefreshToken(req, res) {
     try {
       const authHeader = req.headers["authorization"];
@@ -45,16 +43,14 @@ class Controller {
       const token = await Token.findOne({
         refreshToken,
       });
-      console.log("token", token.accessToken);
-      console.log("4");
       if (!token) {
         console.log("44");
 
         return res.status(404).json({ message: "Invalid refresh token" });
       }
-      const accessToken = token.accessToken;
+      const accessT = token.accessT;
 
-      jwt.verify(accessToken, process.env.JWT_SECRET, async (err, user) => {
+      jwt.verify(accessT, process.env.JWT_SECRET, async (err, user) => {
         if (err) {
           if (err.message === "jwt expired") {
             const { _userId } = token;
@@ -68,7 +64,7 @@ class Controller {
               return res.status(401).json({ message: "Invalid token" });
             }
 
-            //generates a new accessToken
+            //generates a new accessT
             const accessT = createVerificationToken(
               _userId,
               process.env.JWT_TIME_ACCESS
@@ -83,7 +79,7 @@ class Controller {
             if (!updatedToken) {
               return res.status(500).json({ message: "Error updating token" });
             }
-            res.status(200).json({ accessToken });
+            res.status(200).json({ accessT });
           }
         } else {
           return res.status(500).json({

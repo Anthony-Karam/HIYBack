@@ -76,7 +76,7 @@ class Controller {
         },
         async (err, user) => {
           if (err) {
-            console.log(err);
+            console.log("err", err);
           }
           if (user == null) {
             const newUser = new User({
@@ -93,6 +93,7 @@ class Controller {
             const t = "48h";
             const token = createVerificationToken(newUser._id, t);
             sendEmail(newUser.emailAddress, token, newUser.userName);
+
             return res.status(200).json({
               success: true,
               user: newUser,
@@ -105,8 +106,8 @@ class Controller {
             });
           }
           if (user.emailAddress === req.body.emailAddress) {
-            console.log("4");
-            return res.status(400).json({
+            console.log("4,4");
+            return res.status(404).json({
               success: false,
               message: "Please enter a valid Email address",
             });
@@ -121,7 +122,7 @@ class Controller {
         }
       );
     } catch (err) {
-      console.log(err);
+      console.log(message.err);
     }
   }
   async verifyUser(req, res) {
@@ -147,6 +148,8 @@ class Controller {
               .status(404)
               .json({ success: false, message: "No user found" });
           }
+          res.redirect("http://localhost:3006/logIn");
+
           res.json({ success: true, message: "Verification successful" });
         }
       );

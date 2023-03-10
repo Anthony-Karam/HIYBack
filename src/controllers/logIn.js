@@ -2,60 +2,59 @@ const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { createTokenAndRefreshToken } = require("../utils/jwt");
+const {
+  createVerificationToken,
+  createTokenAndRefreshToken,
+} = require("../utils/jwt");
 
 class Controller {
   async logIn(req, res) {
     try {
-      let userNameField = req.body.userName;
+      const { userName, emailAddress, password } = req.body;
 
-      let emailAddress = req.body.emailAddress;
-      let loginPassword = req.body.password;
-      if ((!emailAddress || !userNameField) && !loginPassword) {
-        return res.json({
+      if ((!emailAddress || !userName) && !password) {
+        return res.status(404).json({
           success: false,
           message: "Please enter your User Name/Email address or password ",
         });
       }
       const user = await User.findOne({
-        $or: [
-          { userName: req.body.userName },
-          { emailAddress: req.body.emailAddress },
-        ],
+        $or: [{ userName: userName }, { emailAddress: emailAddress }],
       });
+      console.log(user);
       if (!user) {
-        return res.json({
+        return res.status(404).json({
           success: false,
           message: "PLease enter a valid User name or Email address",
         });
       }
-      if (user) {
-        let match = await bcrypt.compare(req.body.password, user.password);
-        if (!match) {
-          return res.json({
-            sucess: false,
-            message: "Wrong Email or Password",
-          });
-        }
-        if (match && user.verified != true) {
-          return res.json({
-            success: false,
-            message: "Please verify your Email address",
-          });
-        } else {
-          let accessRefreshtoken = await createTokenAndRefreshToken(user._id);
-          console.log("login", accessRefreshtoken);
-          return res.json({
-            success: true,
-            message: "Logged in ",
-            token: accessRefreshtoken,
-          });
-        }
+
+      let match = await bcrypt.compare(req.body.password, user.password);
+      if (!match) {
+        return res.status(404).json({
+          sucess: false,
+          message: "Wrong Email or Password",
+        });
       }
+      if (match && !user.verified) {
+        return res.status(404).json({
+          success: false,
+          message: "Please verify your Email address",
+        });
+      }
+      let userId = user._id;
+      const token = await createTokenAndRefreshToken(userId);
+      res.send({
+        success: true,
+        message: "Logged in",
+        token,
+        user,
+      });
     } catch (err) {
+      console.error(err.message);
       res.json({
         success: false,
-        message: console.log(err),
+        message: "Something went wrong",
       });
     }
   }

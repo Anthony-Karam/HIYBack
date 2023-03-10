@@ -6,14 +6,16 @@ const bp = require("body-parser");
 const path = require("path");
 const fs = require("fs");
 var cors = require("cors");
+const corsOptions = {
+  origin: "http://localhost:3006",
+  // "Content-Type": "application/json",
+  // allowedHeaders: "Content-Type,Authorization,Access-Control-Allow-Origin",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+};
 
-app.use(
-  cors({
-    // origin: "http://localhost:3000",
-    // methods: "GET,POST,PUT,DELETE",
-    // allowedHeaders: "Content-Type,Authorization",
-  })
-);
+app.use(cors(corsOptions));
+
 app.use(bp.json());
 app.use(bp.urlencoded({ useNewUrlParser: true, extended: true }));
 dotenv.config();
@@ -37,21 +39,21 @@ app.use("/users", s3Router);
 
 //Create,update,delete,get
 const userRouter = require("./src/routes/user");
-app.use("/users", userRouter);
+app.use("/api/users", userRouter);
 
 //login/
 const loginRouter = require("./src/routes/login");
-app.use("/users", loginRouter);
+app.use("/api", loginRouter);
 
 const logOutRouter = require("./src/routes/logOut");
-app.use("/users", logOutRouter);
+app.use("/api", logOutRouter);
 
 ///Admin routes
 const categoryRouter = require("./src/routes/category");
-app.use("/admin", categoryRouter);
+app.use("/", categoryRouter);
 
 const courseRouter = require("./src/routes/course");
-app.use("/admin", courseRouter);
+app.use("/", courseRouter);
 
 const aboutRouter = require("./src/routes/about");
 app.use("/admin/about", aboutRouter);

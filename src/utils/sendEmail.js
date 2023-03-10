@@ -15,7 +15,7 @@ const sendEmail = async (email, token, userName) => {
       },
     });
     // construct the verification link
-    const link = `${process.env.URL}/users/verify/${token}`;
+    const link = `${process.env.URL}/api/users/verify/${token}`;
     // Define the email options
 
     const info = await transporter.sendMail({

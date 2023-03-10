@@ -16,18 +16,16 @@ class Controller {
           success: true,
           message: newAboutPost,
         });
-      } else
-        return res.status(400).json({
-          success: false,
-          message: "error",
-        });
+      }
     } catch (err) {
-      console.log(err.message);
+      return res.status(400).json({
+        success: false,
+        message: err.message,
+      });
     }
   }
   async getAllAbout(req, res) {
     const aboutData = await About.find();
-    console.log(aboutData);
     res.status(200).json({
       aboutData,
     });
