@@ -25,7 +25,7 @@ class Controller {
       if (!user) {
         return res.status(404).json({
           success: false,
-          message: "PLease enter a valid User name or Email address",
+          message: "PLease enter a valid Email address",
         });
       }
 

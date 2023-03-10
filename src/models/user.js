@@ -63,10 +63,6 @@ const UserSchema = new Schema(
           type: String,
           default: "Not Enrolled",
         },
-        courseProgress: {
-          type: String,
-          default: 0,
-        },
       },
     ],
     verified: {

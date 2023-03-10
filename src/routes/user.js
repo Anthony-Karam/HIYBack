@@ -5,15 +5,15 @@ const AuthController = require("../controllers/authenticate");
 
 router.post("/register", UserController.createUser);
 router.get(
-  "/:userName",
-  AuthController.authenticateToken,
+  "/:id",
+  // AuthController.authenticateToken,
   UserController.getOneUser
 );
 router.get("/", AuthController.authenticateToken, UserController.getAll);
 router.post("/refresh-token", AuthController.authenticateRefreshToken);
 router.get("/verify/:token", UserController.verifyUser);
 
-router.put("/:userName", UserController.updateUser);
-router.delete("/:userName", UserController.deleteUser);
+router.put("/:id", UserController.updateUser);
+router.delete("/:id", UserController.deleteUser);
 
 module.exports = router;

@@ -21,7 +21,7 @@ class Controller {
   }
 
   async getOneUser(req, res) {
-    const user = await User.findOne({ userName: req.params.userName });
+    const user = await User.findOne({ _id: req.params.id });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -34,20 +34,26 @@ class Controller {
       });
   }
   async updateUser(req, res) {
-    User.findOneAndUpdate(
-      { userName: req.params.userName },
-      { $set: req.body },
-      { new: true },
-      (err, user) => {
-        if (err)
-          return res.status(500).json({
-            success: false,
-            message: "Unvalid input",
-          });
-
-        return res.send(user);
-      }
-    );
+    try {
+      const courseName = req.body.courseName;
+      const user = await User.findOneAndUpdate(
+        {
+          _id: req.params.id,
+          "enrolled.courseName": { $ne: courseName },
+        },
+        {
+          // $pull: { enrolled: { courseName: "Not Enrolled" } },
+          $addToSet: { enrolled: { courseName } },
+        },
+        { new: true }
+      ).lean();
+      return res.status(200).json(user);
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
   }
   async deleteUser(req, res) {
     console.log("delete");
